@@ -131,7 +131,6 @@
 // }
 
 // export default Sidebar;
-
 import { useEffect, useState, useMemo } from "react";
 import api from "../api/api";
 
@@ -144,12 +143,14 @@ function Sidebar({ groups, activeGroup, onSelectGroup, onLogout }) {
   const userId = localStorage.getItem("userId");
 
   // 1. ATTEMPT TO FIND USER NAME FROM GROUPS LIST
-  // We look through all groups to find a member that matches our ID.
   const userName = useMemo(() => {
     if (!groups || groups.length === 0) return "Commander";
     for (const g of groups) {
-      const me = g.members.find((m) => m._id === userId);
-      if (me) return me.name;
+      // 🛡️ SAFETY CHECK: Ensure members array exists
+      if (g.members) {
+        const me = g.members.find((m) => m?._id === userId);
+        if (me) return me.name;
+      }
     }
     return "Commander";
   }, [groups, userId]);
@@ -172,7 +173,7 @@ function Sidebar({ groups, activeGroup, onSelectGroup, onLogout }) {
     window.location.reload(); 
   };
 
-  // STYLES
+  // STYLES (Kept exactly as you had them)
   const inputStyle = {
     width: "100%", marginBottom: "8px", padding: "10px", 
     background: "rgba(0, 0, 0, 0.3)", border: "1px solid rgba(255, 255, 255, 0.1)", 
@@ -200,7 +201,7 @@ function Sidebar({ groups, activeGroup, onSelectGroup, onLogout }) {
         zIndex: 10
       }}
     >
-      {/* HEADER: UFO LOGO + STUDY PLANNER TEXT */}
+      {/* HEADER */}
       <div style={{ marginBottom: "25px", flexShrink: 0, display: "flex", alignItems: "center", gap: "15px" }}>
         <div style={{ fontSize: "32px", filter: "drop-shadow(0 0 10px rgba(99, 102, 241, 0.8))" }}>
           🛸
@@ -228,39 +229,42 @@ function Sidebar({ groups, activeGroup, onSelectGroup, onLogout }) {
         <button onClick={createGroup} style={buttonStyle}>+ Create Mission</button>
       </div>
 
-      {/* MY GROUPS (Flexible Height) */}
+      {/* MY GROUPS */}
       <div style={{ flex: 1, overflowY: "auto", minHeight: "100px", marginBottom: "20px" }}>
         <h4 style={{ opacity: 0.6, textTransform: "uppercase", fontSize: "11px", letterSpacing: "1.5px", position: "sticky", top: 0, background: "rgba(15, 23, 42, 0.95)", padding: "5px 0", zIndex: 1 }}>
           My Squads
         </h4>
-        {groups.map((group) => (
-          <div
-            key={group._id}
-            onClick={() => onSelectGroup(group)}
-            style={{
-              padding: "12px",
-              marginTop: "8px",
-              borderRadius: "8px",
-              cursor: "pointer",
-              background: activeGroup?._id === group._id ? "rgba(99, 102, 241, 0.2)" : "transparent",
-              border: activeGroup?._id === group._id ? "1px solid rgba(99, 102, 241, 0.5)" : "1px solid transparent",
-              transition: "all 0.2s",
-              color: activeGroup?._id === group._id ? "#fff" : "#cbd5e1"
-            }}
-          >
-            <div style={{ fontWeight: "500" }}>{group.name}</div>
-          </div>
+        {groups && groups.map((group) => (
+          // 🛡️ SAFETY CHECK: Ensure group exists
+          group ? (
+            <div
+              key={group._id}
+              onClick={() => onSelectGroup(group)}
+              style={{
+                padding: "12px",
+                marginTop: "8px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                background: activeGroup?._id === group._id ? "rgba(99, 102, 241, 0.2)" : "transparent",
+                border: activeGroup?._id === group._id ? "1px solid rgba(99, 102, 241, 0.5)" : "1px solid transparent",
+                transition: "all 0.2s",
+                color: activeGroup?._id === group._id ? "#fff" : "#cbd5e1"
+              }}
+            >
+              <div style={{ fontWeight: "500" }}>{group.name}</div>
+            </div>
+          ) : null
         ))}
       </div>
 
-      {/* DISCOVER GROUPS (Fixed Bottom Area) */}
+      {/* DISCOVER GROUPS */}
       <div style={{ flexShrink: 0, borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "15px" }}>
         <h4 style={{ opacity: 0.6, textTransform: "uppercase", fontSize: "11px", letterSpacing: "1.5px", marginBottom: "10px" }}>
           Discover
         </h4>
         <div style={{ maxHeight: "120px", overflowY: "auto", marginBottom: "15px" }}>
           {allGroups
-            .filter((g) => !groups?.some((my) => my._id === g._id))
+            .filter((g) => g && !groups?.some((my) => my?._id === g._id)) // 🛡️ Safety Check inside filter
             .map((group) => (
               <div key={group._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px", padding: "8px", background: "rgba(255,255,255,0.03)", borderRadius: "6px" }}>
                 <span style={{ fontSize: "13px", color: "#94a3b8" }}>{group.name}</span>
@@ -274,12 +278,12 @@ function Sidebar({ groups, activeGroup, onSelectGroup, onLogout }) {
                 </button>
               </div>
             ))}
-             {allGroups.filter((g) => !groups?.some((my) => my._id === g._id)).length === 0 && (
+             {allGroups.filter((g) => g && !groups?.some((my) => my?._id === g._id)).length === 0 && (
                <div style={{ fontSize: "12px", color: "#64748b", fontStyle: "italic" }}>No new missions found.</div>
             )}
         </div>
 
-        {/* --- USER PROFILE CARD --- */}
+        {/* USER PROFILE CARD */}
         <div style={{
           background: "rgba(0, 0, 0, 0.3)",
           border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -305,7 +309,7 @@ function Sidebar({ groups, activeGroup, onSelectGroup, onLogout }) {
             </div>
           </div>
 
-          {/* Logout Button (Small Icon) */}
+          {/* Logout Button */}
           <button 
             onClick={onLogout}
             title="Logout"

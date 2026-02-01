@@ -67,7 +67,7 @@
 
 
 function MembersPanel({ group }) {
-  if (!group) return null;
+  if (!group || !group.members) return null;
 
   return (
     <div
@@ -83,51 +83,56 @@ function MembersPanel({ group }) {
         Crew ({group.members.length})
       </h4>
 
-      {group.members.map((member) => (
-        <div key={member._id} style={{ display: "flex", alignItems: "center", marginBottom: "12px", padding: "8px", borderRadius: "8px", background: "rgba(255,255,255,0.03)" }}>
-          {/* GLOWING DOT */}
-          <div
-            style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "50%",
-              backgroundColor: member.online ? "#10b981" : "#475569",
-              marginRight: "12px",
-              boxShadow: member.online ? "0 0 8px #10b981" : "none"
-            }}
-          />
+      {group.members.map((member) => {
+        // 🛡️ SAFETY CHECK: If member is null, skip rendering
+        if (!member) return null;
 
-          <span style={{ fontSize: "13px", fontWeight: "500", color: "#e2e8f0" }}>{member.name}</span>
+        return (
+          <div key={member._id} style={{ display: "flex", alignItems: "center", marginBottom: "12px", padding: "8px", borderRadius: "8px", background: "rgba(255,255,255,0.03)" }}>
+            {/* GLOWING DOT */}
+            <div
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                backgroundColor: member.online ? "#10b981" : "#475569",
+                marginRight: "12px",
+                boxShadow: member.online ? "0 0 8px #10b981" : "none"
+              }}
+            />
 
-          {/* STATUS BADGE */}
-          <span
-            style={{
-              marginLeft: "auto",
-              fontSize: "10px",
-              padding: "2px 6px",
-              borderRadius: "4px",
-              background: 
-                member.status === "studying" ? "rgba(16, 185, 129, 0.2)" 
-                : member.status === "break" ? "rgba(245, 158, 11, 0.2)"
-                : member.status === "doubt" ? "rgba(239, 68, 68, 0.2)"
-                : "transparent",
-              color:
-                member.status === "studying" ? "#34d399"
-                : member.status === "break" ? "#fbbf24"
-                : member.status === "doubt" ? "#f87171"
-                : "#64748b",
-              border: 
-                member.status ? `1px solid ${
-                  member.status === "studying" ? "rgba(16, 185, 129, 0.4)" 
-                  : member.status === "break" ? "rgba(245, 158, 11, 0.4)"
-                  : "rgba(239, 68, 68, 0.4)"
-                }` : "none"
-            }}
-          >
-            {member.status}
-          </span>
-        </div>
-      ))}
+            <span style={{ fontSize: "13px", fontWeight: "500", color: "#e2e8f0" }}>{member.name || "Unknown"}</span>
+
+            {/* STATUS BADGE */}
+            <span
+              style={{
+                marginLeft: "auto",
+                fontSize: "10px",
+                padding: "2px 6px",
+                borderRadius: "4px",
+                background: 
+                  member.status === "studying" ? "rgba(16, 185, 129, 0.2)" 
+                  : member.status === "break" ? "rgba(245, 158, 11, 0.2)"
+                  : member.status === "doubt" ? "rgba(239, 68, 68, 0.2)"
+                  : "transparent",
+                color:
+                  member.status === "studying" ? "#34d399"
+                  : member.status === "break" ? "#fbbf24"
+                  : member.status === "doubt" ? "#f87171"
+                  : "#64748b",
+                border: 
+                  member.status ? `1px solid ${
+                    member.status === "studying" ? "rgba(16, 185, 129, 0.4)" 
+                    : member.status === "break" ? "rgba(245, 158, 11, 0.4)"
+                    : "rgba(239, 68, 68, 0.4)"
+                  }` : "none"
+              }}
+            >
+              {member.status}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

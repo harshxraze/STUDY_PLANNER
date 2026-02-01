@@ -156,7 +156,6 @@ import api from "../api/api";
 import socket from "../socket/socket";
 
 function Chat({ group }) {
-  // --- LOGIC UNTOUCHED ---
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const userId = localStorage.getItem("userId");
@@ -167,9 +166,13 @@ function Chat({ group }) {
     if (!group) return;
     socket.emit("join_group", { groupId: group._id });
     api.get(`/messages/${group._id}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => setMessages(res.data));
-    socket.on("new_message", (msg) => { setMessages((prev) => [...prev, msg]); });
-    return () => socket.off("new_message");
+      .then((res) => setMessages(res.data))
+      .catch((err) => console.error("Fetch messages failed", err));
+    
+    const handleNewMessage = (msg) => { setMessages((prev) => [...prev, msg]); };
+    socket.on("new_message", handleNewMessage);
+    
+    return () => socket.off("new_message", handleNewMessage);
   }, [group]);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
@@ -179,7 +182,6 @@ function Chat({ group }) {
     socket.emit("send_message", { groupId: group._id, userId, text });
     setText("");
   };
-  // --- END LOGIC ---
 
   if (!group) return null;
 
@@ -188,7 +190,10 @@ function Chat({ group }) {
       {/* MESSAGES AREA */}
       <div style={{ flex: 1, overflowY: "auto", padding: "20px" }}>
         {messages.map((m) => {
-          const isMe = m.sender._id === userId;
+          // 🛡️ SAFETY CHECK: If sender is null (deleted user), provide fallback
+          const sender = m?.sender || { _id: "unknown", name: "Unknown User", avatar: "" };
+          const isMe = sender._id === userId;
+
           return (
             <div key={m._id} style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start", marginBottom: "12px" }}>
               <div
@@ -196,7 +201,6 @@ function Chat({ group }) {
                   maxWidth: "65%",
                   padding: "10px 16px",
                   borderRadius: "16px",
-                  // Neon Gradient for me, Dark Glass for others
                   background: isMe 
                     ? "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)" 
                     : "rgba(255, 255, 255, 0.08)",
@@ -211,7 +215,7 @@ function Chat({ group }) {
               >
                 {!isMe && (
                   <div style={{ fontSize: "11px", color: "#94a3b8", marginBottom: "4px", fontWeight: "bold" }}>
-                    {m.sender.name}
+                    {sender.name}
                   </div>
                 )}
                 <div style={{ lineHeight: "1.5" }}>{m.text}</div>
