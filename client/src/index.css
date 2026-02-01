@@ -1,0 +1,104 @@
+@import "tailwindcss";
+/* =========================================
+   GLOBAL STYLES
+   ========================================= */
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #050505; /* Deep Space Black */
+  color: #e2e8f0; 
+  /* "Rajdhani" gives that squared-off, tech feel for normal text */
+  font-family: 'Rajdhani', sans-serif; 
+  font-weight: 500; 
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* HEADINGS - The "Space" Look */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Orbitron', sans-serif; /* The Sci-Fi Font */
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* BUTTONS - Make them look like control switches */
+button {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* INPUTS - Like a data entry terminal */
+input, textarea {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* =========================================
+   SCROLLBARS (Slim & Glowing)
+   ========================================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background: #6366f1;
+  border-radius: 3px;
+  box-shadow: 0 0 10px #6366f1; /* Glowing scrollbar handle */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #818cf8;
+}
+
+/* Input/Textarea autofill fix for dark mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0px 1000px #0f172a inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* =========================================
+   SPACE BACKGROUND ANIMATION
+   ========================================= */
+.space-bg {
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.stars {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: transparent;
+  z-index: -1;
+  pointer-events: none;
+  /* Multi-layered stars */
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
+  background-size: 200px 200px;
+  animation: twinkle 4s infinite;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.8; }
+}

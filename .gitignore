@@ -1,0 +1,20 @@
+# Dependencies
+node_modules
+client/node_modules
+server/node_modules
+
+# Environment Variables (Secrets)
+.env
+client/.env
+server/.env
+
+# Build outputs
+dist
+build
+
+# Docker
+.dockerignore
+
+# OS generated files
+.DS_Store
+Thumbs.db
