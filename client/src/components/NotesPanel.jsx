@@ -179,34 +179,45 @@ import { useEffect, useState } from "react";
 import api from "../api/api";
 
 function NotesPanel({ group }) {
-  // --- LOGIC UNTOUCHED ---
+  // --- LOGIC ---
   const [notes, setNotes] = useState([]);
   const [text, setText] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [file, setFile] = useState(null);
   const token = localStorage.getItem("token");
 
+  // ✅ 1. DEFINE THE URL HERE (At the top of the function)
+  const FILE_URL = "https://study-planner-nv4b.onrender.com"; 
+
   const fetchData = async () => {
     if (!group) return;
-    const notesRes = await api.get(`/notes/${group._id}`, { headers: { Authorization: `Bearer ${token}` } });
-    setNotes(notesRes.data);
-    const attachRes = await api.get(`/attachments/${group._id}`, { headers: { Authorization: `Bearer ${token}` } });
-    setAttachments(attachRes.data);
+    try {
+      const notesRes = await api.get(`/notes/${group._id}`, { headers: { Authorization: `Bearer ${token}` } });
+      setNotes(notesRes.data);
+      const attachRes = await api.get(`/attachments/${group._id}`, { headers: { Authorization: `Bearer ${token}` } });
+      setAttachments(attachRes.data);
+    } catch (err) {
+      console.error("Error fetching data", err);
+    }
   };
 
   const saveNote = async () => {
     if (!text.trim()) return;
-    await api.post("/notes", { groupId: group._id, content: text }, { headers: { Authorization: `Bearer ${token}` } });
-    setText(""); fetchData();
+    try {
+      await api.post("/notes", { groupId: group._id, content: text }, { headers: { Authorization: `Bearer ${token}` } });
+      setText(""); fetchData();
+    } catch (err) { alert("Failed to save note"); }
   };
 
   const uploadFile = async () => {
     if (!file) return;
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("groupId", group._id);
-    await api.post("/attachments", formData, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } });
-    setFile(null); fetchData();
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("groupId", group._id);
+      await api.post("/attachments", formData, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } });
+      setFile(null); fetchData();
+    } catch (err) { alert("Failed to upload file"); }
   };
 
   useEffect(() => { fetchData(); }, [group]);
@@ -248,7 +259,7 @@ function NotesPanel({ group }) {
         <div key={n._id} style={{ background: "rgba(255,255,255,0.03)", padding: "10px", borderRadius: "6px", marginBottom: "10px", border: "1px solid rgba(255,255,255,0.05)" }}>
           <div style={{ fontSize: "13px", color: "#cbd5e1", whiteSpace: "pre-wrap" }}>{n.content}</div>
           <div style={{ fontSize: "10px", color: "#64748b", marginTop: "6px", textAlign: "right" }}>
-            {n.author?.name} • {new Date(n.createdAt).toLocaleTimeString()}
+            {n.author?.name || "Unknown"} • {n.createdAt ? new Date(n.createdAt).toLocaleTimeString() : ""}
           </div>
         </div>
       ))}
@@ -263,7 +274,13 @@ function NotesPanel({ group }) {
       <div style={{ marginTop: "12px" }}>
         {attachments.map((a) => (
           <div key={a._id} style={{ marginBottom: "6px" }}>
-            <a href={`http://localhost:5000/uploads/${a.filename}`} target="_blank" rel="noreferrer" style={{ color: "#38bdf8", textDecoration: "none", fontSize: "13px", display: "flex", alignItems: "center" }}>
+            {/* ✅ 2. USE THE URL HERE */}
+            <a 
+              href={`${FILE_URL}/uploads/${a.filename}`} 
+              target="_blank" 
+              rel="noreferrer" 
+              style={{ color: "#38bdf8", textDecoration: "none", fontSize: "13px", display: "flex", alignItems: "center" }}
+            >
               📄 {a.originalName}
             </a>
           </div>
