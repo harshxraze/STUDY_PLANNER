@@ -13,8 +13,8 @@ connectDB();
 const server = http.createServer(app);
 
 const allowedOrigins = [
-  "http://localhost:5173",                       // Keep this for local development
-  "https://study-planner-1-e301.onrender.com"    // <--- ADD YOUR NEW RENDER FRONTEND URL
+  "http://localhost:5173",                      // Keep this for local development
+  "https://study-planner-1-e301.onrender.com"   // <--- YOUR RENDER FRONTEND URL
 ];
 
 // 3️⃣ Attach Socket.IO
@@ -22,6 +22,8 @@ const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
+    methods: ["GET", "POST"], // 👈 Added for stability
+    credentials: true         // 👈 THIS WAS MISSING! Adding this fixes the CORS error.
   },
 });
 
