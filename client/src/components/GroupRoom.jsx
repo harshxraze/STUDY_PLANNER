@@ -118,7 +118,7 @@ function GroupRoom({ group }) {
         justifyContent: "space-between", 
         alignItems: "center", 
         flexShrink: 0,
-        background: "rgba(0, 0, 0, 0.6)", // Darker background for better text contrast
+        background: "rgba(0, 0, 0, 0.6)", 
         backdropFilter: "blur(10px)"
       }}>
         <div>
@@ -126,14 +126,14 @@ function GroupRoom({ group }) {
           <h2 style={{ 
             margin: 0, 
             fontSize: "26px", 
-            color: "#22d3ee", /* Bright Neon Cyan */
-            textShadow: "0 0 15px rgba(34, 211, 238, 0.6)", /* Strong Glow */
+            color: "#22d3ee", 
+            textShadow: "0 0 15px rgba(34, 211, 238, 0.6)", 
             fontFamily: "'Orbitron', sans-serif",
             letterSpacing: "2px"
           }}>
-            {group.name}
+            {/* 🛡️ SAFETY: Use ?. in case group name is missing momentarily */}
+            {group?.name || "Loading..."}
           </h2>
-          {/* REMOVED THE DESCRIPTION LINE HERE */}
         </div>
 
         <button

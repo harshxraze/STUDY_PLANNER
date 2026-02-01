@@ -205,7 +205,7 @@ import Sidebar from "../components/Sidebar";
 import GroupRoom from "../components/GroupRoom";
 import socket from "../socket/socket";
 
-// STYLES
+// STYLES (Kept same)
 const btnStyle = {
   background: "rgba(255, 255, 255, 0.05)",
   border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -222,7 +222,6 @@ const btnStyle = {
 };
 
 function Dashboard() {
-  // --- LOGIC STARTS (UNTOUCHED) ---
   const [groups, setGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState(null);
 
@@ -234,7 +233,8 @@ function Dashboard() {
       const res = await api.get("/groups/my", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setGroups(res.data);
+      // 🛡️ SAFETY: Ensure we actually got an array
+      setGroups(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Fetch groups error:", err);
     }
@@ -260,14 +260,16 @@ function Dashboard() {
     socket.emit("get_online_users");
   }, [userId]);
 
+  // 🛡️ SOCKET SAFETY UPDATES
   useEffect(() => {
     socket.on("status_updated", ({ userId, status }) => {
       setGroups((prev) =>
         prev.map((group) => ({
           ...group,
-          members: group.members.map((m) =>
+          // Check if members exists before mapping
+          members: group.members ? group.members.map((m) =>
             m._id === userId ? { ...m, status } : m
-          ),
+          ) : []
         }))
       );
     });
@@ -276,9 +278,9 @@ function Dashboard() {
       setGroups((prev) =>
         prev.map((group) => ({
           ...group,
-          members: group.members.map((m) =>
+          members: group.members ? group.members.map((m) =>
             m._id === id ? { ...m, online: true } : m
-          ),
+          ) : []
         }))
       );
     });
@@ -287,21 +289,24 @@ function Dashboard() {
       setGroups((prev) =>
         prev.map((group) => ({
           ...group,
-          members: group.members.map((m) =>
+          members: group.members ? group.members.map((m) =>
             m._id === id ? { ...m, online: false } : m
-          ),
+          ) : []
         }))
       );
     });
 
     socket.on("online_users", (ids) => {
+      // Safety check if ids is null
+      if (!ids || !Array.isArray(ids)) return; 
+      
       setGroups((prev) =>
         prev.map((group) => ({
           ...group,
-          members: group.members.map((m) => ({
+          members: group.members ? group.members.map((m) => ({
             ...m,
             online: ids.includes(m._id),
-          })),
+          })) : []
         }))
       );
     });
@@ -338,7 +343,6 @@ function Dashboard() {
     window.addEventListener("leaveGroup", handler);
     return () => window.removeEventListener("leaveGroup", handler);
   }, []);
-  // --- LOGIC ENDS ---
 
   return (
     <div className="space-bg" style={{ display: "flex", height: "100vh", overflow: "hidden", color: "#fff" }}>
@@ -360,7 +364,7 @@ function Dashboard() {
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          backdropFilter: "blur(3px)", // Subtle blur over the stars
+          backdropFilter: "blur(3px)", 
         }}
       >
         {/* HEADER */}
@@ -368,7 +372,7 @@ function Dashboard() {
           style={{
             padding: "15px 20px",
             borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-            background: "rgba(15, 23, 42, 0.6)", // Semi-transparent dark blue
+            background: "rgba(15, 23, 42, 0.6)", 
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
