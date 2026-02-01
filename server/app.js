@@ -44,9 +44,14 @@ const attachmentRoutes = require("./routes/attachmentRoutes");
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",                       // Keep this for local development
+  "https://study-planner-nv4b.onrender.com"    // <--- ADD YOUR NEW RENDER FRONTEND URL
+];
+
 // 1️⃣ Fix CORS: Allow Frontend + Credentials
 app.use(cors({
-  origin: "http://localhost:5173", // Exact URL of your Frontend
+  origin: allowedOrigins,
   credentials: true,               // Allow cookies & authorization headers
   methods: ["GET", "POST", "PUT", "DELETE"]
 }));
