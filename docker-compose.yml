@@ -6,10 +6,10 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - MONGO_URI=mongodb://mongo:27017/studyplanner
-      - JWT_SECRET=supersecret
-    depends_on:
-      - mongo
+      # 1️⃣ CONNECT TO ATLAS
+      # Docker will read this variable from your .env file automatically
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - ./server:/app
       - /app/node_modules
@@ -19,6 +19,10 @@ services:
     build: ./client
     ports:
       - "5173:5173"
+    environment:
+      # 2️⃣ CONNECT BROWSER TO BACKEND
+      # Since we are running locally, the browser finds the backend at localhost
+      - VITE_API_URL=http://localhost:5000
     depends_on:
       - backend
     volumes:
@@ -26,13 +30,5 @@ services:
       - /app/node_modules
     restart: always
 
-  mongo:
-    image: mongo:6
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    restart: always
-
-volumes:
-  mongo_data:
+# 🗑️ REMOVED: The 'mongo' service and 'volumes' section are gone.
+# Your app is now lightweight and cloud-connected!
