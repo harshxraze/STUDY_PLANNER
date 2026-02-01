@@ -14,7 +14,7 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:5173",                       // Keep this for local development
-  "https://study-planner-nv4b.onrender.com"    // <--- ADD YOUR NEW RENDER FRONTEND URL
+  "https://study-planner-1-e301.onrender.com"    // <--- ADD YOUR NEW RENDER FRONTEND URL
 ];
 
 // 3️⃣ Attach Socket.IO

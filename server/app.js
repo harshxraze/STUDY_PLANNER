@@ -46,7 +46,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",                       // Keep this for local development
-  "https://study-planner-nv4b.onrender.com"    // <--- ADD YOUR NEW RENDER FRONTEND URL
+  "https://study-planner-1-e301.onrender.com"    // <--- ADD YOUR NEW RENDER FRONTEND URL
 ];
 
 // 1️⃣ Fix CORS: Allow Frontend + Credentials
